@@ -4,20 +4,61 @@
         <meta charset="UTF-8">
         <title>Binary Search with Regression</title>
 
+        <style>
+        body { font-size: 18px; }
+        hr {
+            border: none;
+            border-bottom: 1px solid #CCC;
+        }
+        div#container, hr { width: 880px; }
+        div#container, div#canvas-container { margin: 0px auto; }
+        h1 { text-align: center; }
+        </style>
+
         <script src="js/binarysearchregression.js"></script>
     </head>
     <body>
-        <canvas id="canvas"></canvas><br>
-        Distribution type: <select id="dist-type">
-            <option value="0">Uniform</option>
-            <option value="1">Normal</option>
-        </select>
-        <input type="button" id="change-dist-btn" value="Update">
-        <br>
-        Search process: <select id="which">
-            <option value="0">Binary search</option>
-            <option value="1">Newton's method</option>
-        </select>
-        <input type="button" id="step-btn" value="Step">
+        <h1>Improvements to Binary Search</h1>
+        
+        <hr>
+        
+        <div id="container">
+            <p>A few hundred random dots were generated and subsequently sorted.
+            This is what the sorted list of dots looks like. A random dot was
+            chosen as the 'goal'. That's the dot the red line intersects. The
+            program knows the goal dot's height, but it doesn't know its horizontal
+            location. It could check every single dot until it finds one with
+            matching height, but that's naive. Instead, it can take advantage of
+            the fact that it's able to compare guesses to the goal dot's height.
+            The list is sorted, so very few dots need to be checked.</p>
+            
+            <br>
+            
+            <div id="canvas-container">
+                <canvas id="canvas"></canvas><br>
+            </div>
+            Search process:
+            <select id="which">
+                <option value="0">Binary search</option>
+                <option value="1">Newton's method</option>
+            </select>
+            <input type="button" id="step-btn" value="Step">
+            <span style="color: red;">&larr; click this a few times</span>
+            
+            <br>
+            
+            Distribution type:
+            <select id="dist-type">
+                <option value="0">Uniform</option>
+                <option value="1">Normal</option>
+            </select>
+            <input type="button" id="change-dist-btn" value="Update">
+            <span style="color: red;">&larr; then play around with this</span>
+
+            <p>Binary search is the most common method used to solve this problem.
+            This page explores alternatives that are more efficient in certain
+            scenarios. Use the 'Step' button to watch the program guess dots one
+            at a time. It stops once it finds the goal dot.</p>
+        </div>
     </body>
 </html>

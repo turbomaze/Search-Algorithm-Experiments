@@ -45,10 +45,10 @@ function initBinSearchRegression() {
     canvas = $s('#canvas');
     canvas.width = dims[0];
     canvas.height = dims[1];
+    $s('#canvas-container').style.width = dims[0]+'px';
     ctx = canvas.getContext('2d');
     
-    setupVariables();
-    
+    setupVariables(); //variables that need to be set again and again
     updateCanvas();
 }
 
@@ -154,7 +154,7 @@ function drawWalls() {
     if (low >= 0 && high <= dims[0]) {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
         ctx.fillRect(0, 0, low, canvas.height);
-        ctx.fillRect(high, 0, dims[0], canvas.height);
+        ctx.fillRect(high+1, 0, dims[0], canvas.height);
     }
 }
 
