@@ -10,6 +10,7 @@
 /**********
  * config */
 var dims = [800, 600];
+var maxGuesses = 75; //very unlikely to reach 75
 
 /*************
  * constants */
@@ -51,8 +52,9 @@ function setupVariables() {
     vals = [];
     colors = [];
     for (var ai = 0; ai < dims[0]; ai++) {
+        //vals.push(getNormalRandInt(0, dims[1]));
         vals.push(getRandInt(0, dims[1]));
-        colors.push(getRandColor(0.8, 80, 240)); //random -> sorting isn't needed
+        colors.push(getRandColor(0.8, 20, 256)); //random -> sorting isn't needed
     }
     vals.sort(function greater(a, b) { return a - b; });
     
@@ -66,17 +68,16 @@ function setupVariables() {
     //smooths the derivatives by averaging each value with two neighbors
     var neighborDist = 7;
     smoothedDerivatives = [];
-    for (var ai = 1; ai < dims[0]-1; ai++) {
+    for (var ai = 0; ai < dims[0]; ai++) {
         var rightIdx = Math.min(ai+neighborDist, dims[0]-1);
         var leftIdx = Math.max(ai-neighborDist, 0);
         var smooth = (vals[rightIdx]-vals[leftIdx])/(2*neighborDist);
-        smooth *= 0.9+0.2*Math.random(); //helps deal with endless loops
         smoothedDerivatives.push(smooth);
     }
     
-    goal = vals[getRandInt(0, dims[1])]; //whatever the 693rd value is
-    low = 0; //lower bound on the index
-    high = dims[0]; //upper bound on the index
+    goal = vals[getRandInt(0, dims[1])];
+    low = 0; //lower bound on the index (inclusive)
+    high = dims[0]-1; //upper bound on the index (inclusive)
     currentIdx = -1; //no guess yet
     guesses = 0;
 }
@@ -86,10 +87,7 @@ function handleStep(notify) {
     if (notify) updateCanvas();
 
     var ret = -1;
-    var maxGuesses = 50;
-    if (vals[currentIdx] > goal) {
-        high = currentIdx;
-    } else if (vals[currentIdx] === goal || guesses > maxGuesses) {
+    if (vals[currentIdx] === goal || guesses > maxGuesses) {
         ret = guesses;
         if (notify) {
             var msg = 'Found in '+guesses+' guesses.';
@@ -97,8 +95,10 @@ function handleStep(notify) {
             updateCanvas();
         }
         setupVariables();
+    } else if (vals[currentIdx] > goal) {
+        high = currentIdx-1;
     } else {
-        low = currentIdx;
+        low = currentIdx+1;
     }
     
     return ret;
@@ -113,6 +113,7 @@ function getNewIndex() { //uses the global variables
         else {
             function f(g0) { return vals[g0] - goal; }
             function fp(g0) { return smoothedDerivatives[g0]; }
+
             var ret = currentIdx - f(currentIdx)/fp(currentIdx);
             ret = Math.max(Math.min(Math.round(ret), high), low);
             return ret;
@@ -149,10 +150,8 @@ function drawWalls() {
 
 function drawCurrentGuess() {
     if (currentIdx >= 0) {
-        drawPoint(
-            [currentIdx, dims[1]-vals[currentIdx]],
-            8, 'rgba(255, 0, 0, 0.6)'
-        );
+        var loc = [currentIdx, dims[1]-vals[currentIdx]];
+        drawPoint(loc, 8, 'rgba(255, 0, 0, 0.6)');
     }
 }
 
@@ -164,14 +163,20 @@ function drawGoalLine() {
 }
 
 function testSearchMethod(n) {
-    var totalSteps = 0;
-    var ai = n;
+    setupVariables(); //equal start, shouldn't be included in the time
+    
+    var s = +new Date();
+    var totalSteps = 0, ai = n;
     while (ai > 0) {
-        totalSteps += 1;
         var res = handleStep(false);
-        if (res > -1) ai--;
+        if (res > -1) {
+            totalSteps += res
+            ai--;
+        }
     }
-    return totalSteps/n; //average number of steps per search
+
+    //average number of steps per search and the time
+    return [totalSteps/n, (+new Date()-s)+'ms']; 
 }
 
 /********************
@@ -218,7 +223,12 @@ function $s(id) { //for convenience
 }
 
 function getRandInt(low, high) { //output is in [low, high)
-    return Math.floor(low + 0.5*(Math.random()+Math.random())*(high-low));
+    return Math.floor(low + Math.random()*(high-low));
+}
+
+function getNormalRandInt(low, high) { //output is in [low, high)
+    var normalRandom = Math.random()+Math.random()+Math.random();
+    return Math.floor(low + normalRandom*(high-low)/3);
 }
 
 function round(n, places) {
