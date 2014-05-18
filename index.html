@@ -8,7 +8,13 @@
     </head>
     <body>
         <canvas id="canvas"></canvas><br>
-        <select id="which">
+        Distribution type: <select id="dist-type">
+            <option value="0">Uniform</option>
+            <option value="1">Normal</option>
+        </select>
+        <input type="button" id="change-dist-btn" value="Update">
+        <br>
+        Search process: <select id="which">
             <option value="0">Binary search</option>
             <option value="1">Newton's method</option>
         </select>

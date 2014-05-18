@@ -33,6 +33,11 @@ var guesses;
 /******************
  * work functions */
 function initBinSearchRegression() {
+    $s('#change-dist-btn').addEventListener('click', function() {
+        setupVariables();
+        updateCanvas();
+    });
+
     $s('#step-btn').addEventListener('click', function() {
         handleStep(true);
     });
@@ -48,12 +53,16 @@ function initBinSearchRegression() {
 }
 
 function setupVariables() {
+    //decide what the distribution function is
+    var distributionFunction = [
+        function() { return getRandInt(0, dims[1]); },
+        function() { return getNormalRandInt(0, dims[1]); },
+    ][$s('#dist-type').value];
+
     //set up the values and their colors
-    vals = [];
-    colors = [];
+    vals = [], colors = [];
     for (var ai = 0; ai < dims[0]; ai++) {
-        //vals.push(getNormalRandInt(0, dims[1]));
-        vals.push(getRandInt(0, dims[1]));
+        vals.push(distributionFunction());
         colors.push(getRandColor(0.8, 20, 256)); //random -> sorting isn't needed
     }
     vals.sort(function greater(a, b) { return a - b; });
@@ -75,6 +84,7 @@ function setupVariables() {
         smoothedDerivatives.push(smooth);
     }
     
+    //assign the rest of the variables
     goal = vals[getRandInt(0, dims[1])];
     low = 0; //lower bound on the index (inclusive)
     high = dims[0]-1; //upper bound on the index (inclusive)
@@ -88,12 +98,12 @@ function handleStep(notify) {
 
     var ret = -1;
     if (vals[currentIdx] === goal || guesses > maxGuesses) {
-        ret = guesses;
         if (notify) {
             var msg = 'Found in '+guesses+' guesses.';
             console.log(msg), alert(msg);
             updateCanvas();
         }
+        ret = guesses;
         setupVariables();
     } else if (vals[currentIdx] > goal) {
         high = currentIdx-1;
