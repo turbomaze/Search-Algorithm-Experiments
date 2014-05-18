@@ -63,14 +63,16 @@ function setupVariables() {
     }
     derivatives[dims[0]-1] = derivatives[dims[0]-2];
 
-    //smooths the derivatives by averaging each value with its two neighbors
+    //smooths the derivatives by averaging each value with two neighbors
+    var neighborDist = 7;
     smoothedDerivatives = [];
     for (var ai = 1; ai < dims[0]-1; ai++) {
-        var smooth = (derivatives[ai-1]+derivatives[ai]+derivatives[ai+1])/3;
+        var rightIdx = Math.min(ai+neighborDist, dims[0]-1);
+        var leftIdx = Math.max(ai-neighborDist, 0);
+        var smooth = (vals[rightIdx]-vals[leftIdx])/(2*neighborDist);
+        smooth *= 0.9+0.2*Math.random(); //helps deal with endless loops
         smoothedDerivatives.push(smooth);
     }
-    smoothedDerivatives[0] = smoothedDerivatives[1];
-    smoothedDerivatives[dims[0]-1] = smoothedDerivatives[dims[0]-2];
     
     goal = vals[getRandInt(0, dims[1])]; //whatever the 693rd value is
     low = 0; //lower bound on the index
@@ -125,14 +127,23 @@ function getNewIndex() { //uses the global variables
 
 function updateCanvas() {
     clearCanvas();
-    drawVals();
-    drawCurrentGuess();
-    drawGoalLine();
+    drawVals(); //the dots
+    drawWalls(); //grey out the areas no longer in the search space
+    drawCurrentGuess(); //red dot representing the current guess
+    drawGoalLine(); //red line intersecting the list at the goal point
 }
 
 function drawVals() {
     for (var ai = 0; ai < vals.length; ai++) {
         drawPoint([ai, dims[1]-vals[ai]], 3, colors[ai]);
+    }
+}
+
+function drawWalls() {
+    if (low >= 0 && high <= dims[0]) {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+        ctx.fillRect(0, 0, low, canvas.height);
+        ctx.fillRect(high, 0, dims[0], canvas.height);
     }
 }
 
