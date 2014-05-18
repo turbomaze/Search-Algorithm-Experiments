@@ -2,7 +2,7 @@
 |   Binary Search  |
 | with Regression  |
 | @author Anthony  |
-| @version 0.2     |
+| @version 0.2.1   |
 | @date 2014/05/17 |
 | @edit 2014/05/18 |
 \******************/
@@ -85,7 +85,7 @@ function setupVariables() {
     }
     
     //assign the rest of the variables
-    goal = vals[getRandInt(0, dims[1])];
+    goal = vals[getRandInt(0, dims[0])];
     low = 0; //lower bound on the index (inclusive)
     high = dims[0]-1; //upper bound on the index (inclusive)
     currentIdx = -1; //no guess yet
