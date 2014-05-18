@@ -2,7 +2,7 @@
 |   Binary Search  |
 | with Regression  |
 | @author Anthony  |
-| @version 0.1     |
+| @version 0.2     |
 | @date 2014/05/17 |
 | @edit 2014/05/18 |
 \******************/
