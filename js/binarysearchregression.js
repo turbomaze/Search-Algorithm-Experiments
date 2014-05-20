@@ -4,7 +4,7 @@
 | @author Anthony  |
 | @version 0.2.1   |
 | @date 2014/05/17 |
-| @edit 2014/05/18 |
+| @edit 2014/05/19 |
 \******************/
 
 /**********
@@ -140,7 +140,7 @@ function getNewIndex() { //uses the global variables
             return ret;
         }
     }
-    function chooseWithStringDescentSearch(l, h) {
+    function chooseWithStringDescent(l, h) {
         var gvvl = goal/vals[vals.length-1];
         if (currentIdx < 0) {
             return Math.round(gvvl*(p2-p1));
@@ -154,10 +154,14 @@ function getNewIndex() { //uses the global variables
             return Math.round(p1+gvvl*(p2-p1));
         }
     }
+    function chooseWithNewtonsString(l, h) {
+        if (currentIdx < 0) return chooseWithStringDescent(l, h);
+        else return chooseWithNewtonsMethod(l, h);
+    }
 
     var choose = [
         chooseWithBinarySearch, chooseWithNewtonsMethod,
-        chooseWithStringDescentSearch
+        chooseWithStringDescent, chooseWithNewtonsString
     ];
     var which = $s('#which').value;
     guesses++;

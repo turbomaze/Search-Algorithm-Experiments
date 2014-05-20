@@ -2,35 +2,63 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>Binary Search with Regression</title>
+        <title>Improvements to Binary Search</title>
 
+        <link href='http://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
         <style>
-        body { font-size: 18px; }
+        html, body { margin: 0; padding: 0; }
+        body { font-size: 20px; }
+
+        header {
+            background-image: url(http://igliu.com/content/images/2014/Apr/CA105_cover-3.png);
+        }
+        h1 {
+            text-align: center;
+            color: white;
+            margin: 0px;
+            padding: 80px 0px 40px 0px;
+        }
+
         hr {
             border: none;
             border-bottom: 1px solid #CCC;
         }
-        div#container, hr { width: 880px; }
+        div#container, hr { width: 800px; }
         div#container, div#canvas-container { margin: 0px auto; }
-        h1 { text-align: center; }
+        p { font-family: 'Open Sans', sans-serif; }
+        a { font-family: serif; text-decoration: none; }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 40px;
+            padding-bottom: 120px;
+            background-image: url(http://igliu.com/content/images/2014/Apr/CA105_cover-3.png);
+            color: white;
+        }
+        footer a:visited {
+            color: #9DD3EB;
+        }
         </style>
 
         <script src="js/binarysearchregression.js"></script>
     </head>
     <body>
-        <h1>Improvements to Binary Search</h1>
-        
-        <hr>
+        <header>
+            <h1>Improvements to Binary Search</h1>
+        </header>
         
         <div id="container">
-            <p>A few hundred random dots were generated and subsequently sorted.
-            This is what the sorted list of dots looks like. A random dot was
-            chosen as the 'goal'. That's the dot the red line intersects. The
-            program knows the goal dot's height, but it doesn't know its horizontal
-            location. It could check every single dot until it finds one with
-            matching height, but that's naive. Instead, it can take advantage of
-            the fact that it's able to compare guesses to the goal dot's height.
-            The list is sorted, so very few dots need to be checked.</p>
+            <p>
+                A few hundred random dots were generated and subsequently sorted.
+                This is what the sorted list of dots looks like. A random dot was
+                chosen as the 'goal'. That's the dot the red line intersects. The
+                program knows the goal dot's height, but it doesn't know its horizontal
+                location. It could check every single dot until it finds one with
+                matching height, but that's naive. Instead, it takes advantage of
+                the fact that it's able to compare guesses to the goal dot's height.
+                The list is sorted, so very few dots need to be checked.
+            </p>
             
             <br>
             
@@ -42,6 +70,7 @@
                 <option value="0">Binary search</option>
                 <option value="1">Newton's method</option>
                 <option value="2">String Descent</option>
+                <option value="3">Newton's String</option>
             </select>
             <input type="button" id="step-btn" value="Step">
             <span style="color: red;">&larr; click this a few times</span>
@@ -56,10 +85,76 @@
             <input type="button" id="change-dist-btn" value="Update">
             <span style="color: red;">&larr; then play around with this</span>
 
-            <p>Binary search is the most common method used to solve this problem.
-            This page explores alternatives that are more efficient in certain
-            scenarios. Use the 'Step' button to watch the program guess dots one
-            at a time. It stops once it finds the goal dot.</p>
+            <p>
+                <a target="_blank" href="http://en.wikipedia.org/wiki/Binary_search_algorithm">
+                    Binary search
+                </a> is the most common method used to solve this problem.
+                This page explores alternatives that are more efficient in certain
+                scenarios. Use the 'Step' button to watch the program guess dots one
+                at a time. It stops once it finds the goal dot. In 10,000 trials on
+                uniform distributions, binary search required <b>8.73 guesses on
+                average</b>.
+            </p>
+
+            <h2>Newton's method</h2>
+            <p>
+                <a target="_blank" href="http://en.wikipedia.org/wiki/Newton's_method">
+                    Newton's method
+                </a> is an algorithm used in math to find the zeroes of a function.
+                It's based on the idea that if you guess the location of a zero, 
+                you can improve your guess by looking at the intersection of the
+                x-axis and the line tangent to your guessed point. I applied this
+                technique to search by setting the x-axis equal to the goal value.
+                This simple construction enables me to apply Newton's method
+                to this problem with very little modification.
+            </p>
+            <p>
+                Newton's method requires knowledge about the derivatives of the
+                function to be analyzed, so this method requires computing the
+                discrete derivatives of all the points. I approximate this by
+                computing the slope between two of each dots' neighbors. In 10,000
+                trials on uniform distributions, Newton's method required <b>5.04
+                guesses on average</b>.
+            </p>
+            
+            <h2>String Descent</h2>
+            <p>
+                String Descent is an algorithm I made up (probably exists already)
+                that's very similar to Newton's method in that it treats the goal
+                value, the value that's being search for, as the x-axis. I wanted
+                to be able to reap the benefits of this connection to math without
+                having to spend time computing hundreds of derivatives in
+                preparation for a search.
+            </p>
+            <p>
+                My first observation was that uniform distributions are linear
+                when they're sorted. I can compute the slope of the segment they
+                form by using the rise over run formula on the bottom left and
+                top right points. By calculating where this line intersects the
+                "x-axis", I can come up with a <em>very</em> good first guess for
+                the index of the goal value. I adjust the endpoints of the
+                segment depending on whether or not my guess is too high or too
+                low. In 10,000 trials on uniform distributions, String Descent
+                required <b>11.30 guesses on average</b>.
+            </p>
+
+            <h2>Newton's String</h2>
+            <p>
+                String Descent wasn't very good, but it consistently came up with
+                amazing first guesses. Occasionally (better than chance), its first
+                guesses are correct. Newton's method performs fantastically on
+                average, but as is the case with continuous functions in math,
+                its success in search depends on good first guesses. Newton's String
+                uses String Descent for the initial guess and Newton's method for
+                further refinement. In 10,000 trials on uniform distributions,
+                Newton's String required <b>3.40 guesses on average</b>.
+            </p>
         </div>
+
+        <footer>
+            &copy; 2014. Made by Anthony Liu.<br>
+            Check out my blog at
+            <a href="http://igliu.com">http://igliu.com</a>.
+        </footer>
     </body>
 </html>
