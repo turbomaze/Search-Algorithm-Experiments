@@ -21,14 +21,19 @@ var canvas;
 var ctx;
 var vals;
 var colors;
-var derivatives;
-var smoothedDerivatives;
 
 var goal;
 var low;
 var high;
 var currentIdx;
 var guesses;
+
+//newton's method
+var derivatives;
+var smoothedDerivatives;
+
+//string descent
+var p1, p2;
 
 /******************
  * work functions */
@@ -55,8 +60,11 @@ function initBinSearchRegression() {
 function setupVariables() {
     //decide what the distribution function is
     var distributionFunction = [
-        function() { return getRandInt(0, dims[1]); },
-        function() { return getNormalRandInt(0, dims[1]); },
+        function() { return dims[1]*Math.random(); }, //random float
+        function() { //normal random float
+            var r = Math.random;
+            return dims[1]*(r()+r()+r())/3;
+        },
     ][$s('#dist-type').value];
 
     //set up the values and their colors
@@ -83,6 +91,9 @@ function setupVariables() {
         var smooth = (vals[rightIdx]-vals[leftIdx])/(2*neighborDist);
         smoothedDerivatives.push(smooth);
     }
+
+    //initial p1, p2
+    p1 = 0, p2 = dims[0];
     
     //assign the rest of the variables
     goal = vals[getRandInt(0, dims[0])];
@@ -129,8 +140,25 @@ function getNewIndex() { //uses the global variables
             return ret;
         }
     }
+    function chooseWithStringDescentSearch(l, h) {
+        var gvvl = goal/vals[vals.length-1];
+        if (currentIdx < 0) {
+            return Math.round(gvvl*(p2-p1));
+        } else {
+            if (vals[currentIdx] > goal) {
+                p2 = Math.min(currentIdx, p2-1);
+            } else {
+                p1 = Math.max(currentIdx, p1+1);
+            }
+            
+            return Math.round(p1+gvvl*(p2-p1));
+        }
+    }
 
-    var choose = [chooseWithBinarySearch, chooseWithNewtonsMethod];
+    var choose = [
+        chooseWithBinarySearch, chooseWithNewtonsMethod,
+        chooseWithStringDescentSearch
+    ];
     var which = $s('#which').value;
     guesses++;
     return Math.floor(choose[which](low, high));
