@@ -60,8 +60,11 @@ function initBinSearchRegression() {
 function setupVariables() {
     //decide what the distribution function is
     var distributionFunction = [
-        function() { return getRandInt(0, dims[1]); },
-        function() { return getNormalRandInt(0, dims[1]); },
+        function() { return dims[1]*Math.random(); }, //random float
+        function() { //normal random float
+            var r = Math.random;
+            return dims[1]*(r()+r()+r())/3;
+        },
     ][$s('#dist-type').value];
 
     //set up the values and their colors
@@ -148,7 +151,7 @@ function getNewIndex() { //uses the global variables
                 p1 = Math.max(currentIdx, p1+1);
             }
             
-            return Math.round(p1+gvvl*(p2-p1)]);
+            return Math.round(p1+gvvl*(p2-p1));
         }
     }
 
